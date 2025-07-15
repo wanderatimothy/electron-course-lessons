@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Document</title>
+</head>
+<body>
+    <h1>Hello Electron</h1>
+    <form>
+        <label for="file">Pick a video file</label>
+        <button type="submit">Upload Video</button>
+        <p>Video Metadata</p>
+        <br>
+        <p>Duration: <span id="duration"></span></p>
+    </form>
+    <script>
+       const electron = require('electron');
+       const { ipcRenderer } = electron;
+       document.querySelector('form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            ipcRenderer.send('open-dialog-for-file')
+       })
+       ipcRenderer.on('selected-file-duration', (event, file) => {
+            document.getElementById('duration').innerText = (file + ' seconds');
+       })
+       ipcRenderer.on('error-selected-file', (event, error) => {
+        document.getElementById('duration').innerText = 'Error: ' + error.message;})
+    </script>
+</body>
+</html>
