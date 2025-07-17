@@ -11,6 +11,7 @@
                 font-family: Arial, sans-serif;
                 margin: 0;
                 padding: 0;
+            }
             form {
                 max-width: 600px;
                 margin: 0 auto;
@@ -48,5 +49,12 @@
                 <button type="submit">Add Task</button>
             </label>
         </form>
+        <script>
+            document.querySelector('form').addEventListener('submit', (event) => {
+                event.preventDefault();
+                const todo = document.getElementById('todo').value;
+                window.electron.send('add:todo', todo);
+            })
+        </script>
     </body>
 </html>

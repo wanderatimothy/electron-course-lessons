@@ -1,4 +1,5 @@
 const  electron  = require('electron');
+const path = require('node:path');
 module.exports.createNewWindow = (filePath , options)  => {
     const { BrowserWindow } = electron;
    let newWindow = new BrowserWindow({
@@ -7,12 +8,13 @@ module.exports.createNewWindow = (filePath , options)  => {
     height: options.height || 600,
     title: options.title || 'New Window',
     webPreferences: {
-        preload: __dirname + '/preload.js',
-        contextIsolation: options.contextIsolation || false,
+        preload:path.join(__dirname,'preload.js'),
+        contextIsolation: options.contextIsolation || true,
+        nodeIntegration:false
     }
    });
    newWindow.loadFile(filePath);
-//    newWindow.setMenu(options.menu || null);
+   newWindow.setMenu(options.menu || null);
    return newWindow;
 }
 

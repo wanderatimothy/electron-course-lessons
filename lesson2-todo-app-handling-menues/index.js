@@ -1,7 +1,8 @@
 const electron = require('electron');
-const { app, BrowserWindow, Menu } = electron;
+const { app, BrowserWindow, Menu , ipcMain} = electron;
 const os = require('os');
 const {createNewWindow} = require('./utilities');
+const path = require('node:path');
 require('dotenv').config();
 
 let mainWindow;
@@ -22,6 +23,9 @@ let menuTemplate = [
                         height: 300,
                         title: 'Add Todo',
                     });
+                    addTodoWindow.on('closed', () => {
+                        addTodoWindow = null;
+                    })
                 }
 
             }},
@@ -35,6 +39,12 @@ let menuTemplate = [
                 }
              })() // use an imediately invoked frunction for best practices
 
+            },
+            {
+                label:'Clear All',
+                click: () => {
+                    mainWindow.webContents.send('clear:all');
+                }
             }
         ]
     }
@@ -43,8 +53,10 @@ app.disableHardwareAcceleration() //
 app.whenReady().then(() => {
     mainWindow = new BrowserWindow({
         webPreferences :{
-            contextIsolation: false,
-            preload: __dirname + '/preload.js'
+            contextIsolation: true,
+            preload: path.join(__dirname,'preload.js'),
+            nodeIntegration:false
+
         }
     })
     mainWindow.loadFile(__dirname + '/pages/main.html');
@@ -90,3 +102,12 @@ app.whenReady().then(() => {
     Menu.setApplicationMenu(mainMenue)
     mainWindow.on('closed',() => app.quit());
 })
+
+ipcMain.on('add:todo', (_, todo) => {
+    if(!mainWindow) {
+        console.log('Window not found');
+        return;
+    }
+    mainWindow.webContents.send('add:todo', todo);
+    addTodoWindow.close()
+});
